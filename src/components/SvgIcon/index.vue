@@ -7,7 +7,7 @@
 
 <script>
 // doc: https://panjiachen.github.io/vue-element-admin-site/feature/component/svg-icon.html#usage
-import { isExternal } from '@/utils/validate'
+import valid from '@/utils/validator'
 
 export default {
   name: 'SvgIcon',
@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     isExternal() {
-      return isExternal(this.iconClass)
+      return valid.isExternal(this.iconClass)
     },
     iconName() {
       return `#icon-${this.iconClass}`

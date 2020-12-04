@@ -1,13 +1,15 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, getAuth } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import da from 'element-ui/src/locale/lang/da'
 
 const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: []
+    roles: [],
+    organs: []
   }
 }
 
@@ -28,52 +30,71 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_ORGANS: (state, organs) => {
+    state.organs = organs
   }
 }
 
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { phone, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
+      login({ phone: phone.trim(), password: password }).then(res => {
+        const { data } = res
         commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        commit('SET_ORGANS', data.organs)
         resolve()
       }).catch(error => {
         reject(error)
       })
     })
   },
-
-  // get user info
-  getInfo({ commit, state }) {
+  // get user auth
+  getAuth({ commit }, userInfo) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getAuth(userInfo).then(response => {
         const { data } = response
-
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('请重新登录')
         }
-
-        const { roles, name, avatar } = data
-
-        // roles must be a non-empty array
+        const roles = data.permission
         if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+          reject('没有权限，请联系管理员')
         }
-
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_NAME', data.userName)
+        // todo 修改
+        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+        setToken(data.token)
         resolve(data)
       }).catch(error => {
         reject(error)
       })
     })
   },
-
+  // get user info
+  getInfo({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      getInfo({ token: state.token }).then(response => {
+        const { data } = response
+        if (!data) {
+          reject('请重新登录')
+        }
+        const roles = data.permission
+        if (!roles || roles.length <= 0) {
+          reject('没有权限，请联系管理员')
+        }
+        commit('SET_ROLES', roles)
+        commit('SET_NAME', data.userName)
+        // todo 修改
+        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+        resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
@@ -87,7 +108,6 @@ const actions = {
       })
     })
   },
-
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
