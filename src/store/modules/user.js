@@ -1,7 +1,6 @@
 import { login, logout, getInfo, getAuth } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
-import da from 'element-ui/src/locale/lang/da'
 
 const getDefaultState = () => {
   return {
@@ -59,14 +58,11 @@ const actions = {
         if (!data) {
           reject('请重新登录')
         }
-        const roles = data.permission
-        if (!roles || roles.length <= 0) {
-          reject('没有权限，请联系管理员')
-        }
-        commit('SET_NAME', data.userName)
-        // todo 修改
-        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
-        setToken(data.token)
+        // 重置路由，重选多机构情况
+        resetRouter()
+        commit('SET_ROLES', [])
+        const { token } = data
+        setToken(token)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -81,14 +77,14 @@ const actions = {
         if (!data) {
           reject('请重新登录')
         }
-        const roles = data.permission
-        if (!roles || roles.length <= 0) {
+        const { permission, userName, organs, avatar } = data
+        if (!permission || permission.length <= 0) {
           reject('没有权限，请联系管理员')
         }
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', data.userName)
-        // todo 修改
-        commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
+        commit('SET_ROLES', permission)
+        commit('SET_NAME', userName)
+        commit('SET_ORGANS', organs)
+        commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
         reject(error)

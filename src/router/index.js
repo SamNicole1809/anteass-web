@@ -92,8 +92,39 @@ export const asyncRoutes = [
       {
         path: 'cost',
         name: 'EduCost',
-        component: () => import('@/views/dashboard/index'),
-        meta: { title: '课程收费', icon: 'form', rules: [] }
+        redirect: '/edu/cost/course',
+        component: () => import('@/views/edu/CourseFee'),
+        meta: { title: '课程收费', icon: 'form', rules: [] },
+        children: [
+          {
+            path: 'course',
+            name: 'EduCostCourse',
+            component: () => import('@/views/components/edu/CourseFeeCourse'),
+            meta: { title: '', icon: 'form', rules: [] },
+            hidden: true
+          },
+          {
+            path: 'goods',
+            name: 'EduCostGood',
+            component: () => import('@/views/components/edu/CourseFeeGoods'),
+            meta: { title: '', icon: 'form', rules: [] },
+            hidden: true
+          },
+          {
+            path: 'cost',
+            name: 'EduCostCost',
+            component: () => import('@/views/components/edu/CourseFeeCost'),
+            meta: { title: '', icon: 'form', rules: [] },
+            hidden: true
+          },
+          {
+            path: 'combo',
+            name: 'EduCostCombo',
+            component: () => import('@/views/components/edu/CourseFeeCombo'),
+            meta: { title: '', icon: 'form', rules: [] },
+            hidden: true
+          }
+        ]
       },
       {
         path: 'record',

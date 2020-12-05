@@ -27,6 +27,6 @@ export function getAuth(data) {
 export function logout() {
   return request({
     url: '/organ/sys/user/logout',
-    method: 'get'
+    method: 'delete'
   })
 }
